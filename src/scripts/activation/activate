@@ -1,0 +1,55 @@
+# This file MUST be used with "source bin/activate" *from bash*
+
+deactivate () {
+    # Reset old environment variables
+    if [ -n "${DOTNET_VIRTUAL_ENV_OLD_PATH:-}" ] ; then
+        PATH="${DOTNET_VIRTUAL_ENV_OLD_PATH:-}"
+        export PATH
+        unset DOTNET_VIRTUAL_ENV_OLD_PATH
+    fi
+
+    # This should detect bash and zsh, which have a hash command that must
+    # be called to get it to forget past commands.  Without forgetting
+    # past commands the $PATH changes we made may not be respected
+    if [ -n "${BASH:-}" -o -n "${ZSH_VERSION:-}" ] ; then
+        hash -r 2> /dev/null
+    fi
+
+    if [ -n "${DOTNET_VIRTUAL_ENV_OLD_PS1:-}" ] ; then
+        PS1="${DOTNET_VIRTUAL_ENV_OLD_PS1:-}"
+        export PS1
+        unset DOTNET_VIRTUAL_ENV_OLD_PS1
+    fi
+
+    unset DOTNET_VIRTUAL_ENV
+    unset DOTNET_VIRTUAL_ENV_PROMPT_PREFIX
+
+    if [ ! "${1:-}" = "NonDestructive" ] ; then
+        # Self destruct!
+        unset -f deactivate
+    fi
+}
+
+# Unset irrelevant variables
+deactivate NonDestructive
+
+DOTNET_VIRTUAL_ENV="{{DOTNET_VIRTUAL_ENV_PATH}}"
+export DOTNET_VIRTUAL_ENV
+
+DOTNET_VIRTUAL_ENV_OLD_PATH="$PATH"
+PATH="$DOTNET_VIRTUAL_ENV:$PATH"
+export PATH
+
+DOTNET_VIRTUAL_ENV_PROMPT_PREFIX="({{DOTNET_VIRTUAL_ENV_DIR}}) "
+export DOTNET_VIRTUAL_ENV_PROMPT_PREFIX
+
+DOTNET_VIRTUAL_ENV_OLD_PS1="${PS1:-}"
+PS1="$DOTNET_VIRTUAL_ENV_PROMPT_PREFIX${PS1:-}"
+export PS1
+
+# This should detect bash and zsh, which have a hash command that must
+# be called to get it to forget past commands.  Without forgetting
+# past commands the $PATH changes we made may not be respected
+if [ -n "${BASH:-}" -o -n "${ZSH_VERSION:-}" ] ; then
+    hash -r 2> /dev/null
+fi

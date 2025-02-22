@@ -1,0 +1,43 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFrameworks>net8.0;net9.0</TargetFrameworks>
+    <PublishSingleFile Condition="'$(PublishAot)' == 'true'">true</PublishSingleFile>
+    <SelfContained Condition="'$(PublishAot)' == 'true'">true</SelfContained>
+    <PackAsTool Condition="'$(PublishAot)' == 'false'">true</PackAsTool>
+    <ToolCommandName>dotnet-venv</ToolCommandName>
+    <RootNamespace>TheBlueSky.DotNet.Tools.VirtualEnvironment</RootNamespace>
+    <AssemblyName>dotnet-venv</AssemblyName>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <Product>TheBlueSky.DotNet.Tools.VirtualEnvironment</Product>
+    <Description>A dotnet CLI tool to create a virtual environment, similar to Python venv</Description>
+    <Authors>Essam Almohammadi</Authors>
+    <Company>TheBlueSky.Net</Company>
+    <Copyright>© 2025 TheBlueSky.Net</Copyright>
+    <NeutralLanguage>en-GB</NeutralLanguage>
+    <AssemblyVersion>1.0.0</AssemblyVersion>
+    <FileVersion>$(AssemblyVersion)</FileVersion>
+    <AssemblyInformationalVersion>1.0 RTM</AssemblyInformationalVersion>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <PackageId>dotnet-venv</PackageId>
+    <PackageVersion>$(AssemblyVersion)</PackageVersion>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <PackageProjectUrl>https://github.com/TheBlueSky/dotnet-venv</PackageProjectUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <RepositoryUrl>https://github.com/TheBlueSky/dotnet-venv.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>.NET;dotnet;dotnet tool;venv;Virtual Environment</PackageTags>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="data\*" />
+    <EmbeddedResource Include="scripts\activation\*" />
+    <EmbeddedResource Include="scripts\installation\*" />
+  </ItemGroup>
+
+</Project>
