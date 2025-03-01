@@ -1,0 +1,84 @@
+name: Release standalone executable
+
+on:
+  push:
+    tags:
+      - 'releases/v*.*.*'
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+
+    permissions:
+      contents: write # Allows creating releases and uploading assets
+
+    strategy:
+      matrix:
+        os: [macos-latest, ubuntu-latest, windows-latest]
+        project:
+          - name: dotnet-venv
+            path: src/dotnet-venv.csproj
+        include:
+          - os: macos-latest
+            rid: osx-x64
+          - os: ubuntu-latest
+            rid: linux-x64
+          - os: windows-latest
+            rid: win-x64
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Validate tag format and extract version
+        id: extract_version
+        shell: bash # bash works on all GitHub Actions runners (Windows uses Git Bash)
+        run: |
+          echo "Extracting version from tag ${{ github.ref }}"
+          if [[ ${{ github.ref }} =~ ^refs/tags/releases/v([0-9]+\.[0-9]+\.[0-9]+)$ ]]; then
+            echo "Version extracted: ${BASH_REMATCH[1]}"
+            echo "version=${BASH_REMATCH[1]}" >> $GITHUB_OUTPUT
+            echo "release_tag=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+          else
+            echo "Tag ${{ github.ref }} is not a valid version tag"
+            exit 1
+          fi
+
+      - name: Setup .NET 9.0.x
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 9.0.x
+
+      - name: Build & publish
+        run: dotnet publish ./${{ matrix.project.path }} --configuration Release --framework net9.0 --runtime ${{ matrix.rid }} --self-contained -p:PublishAot=true -p:Version=${{ steps.extract_version.outputs.version }} --output ./publish/${{ matrix.project.name }}
+
+      - name: Create artifact archive (Windows)
+        if: matrix.os == 'windows-latest'
+        run: |
+          cd ./publish
+          7z a -tzip ${{ matrix.project.name }}-${{ matrix.rid }}.zip ${{ matrix.project.name }}/${{ matrix.project.name }}.exe
+
+      - name: Create artifact archive (Linux/macOS)
+        if: matrix.os != 'windows-latest'
+        run: |
+          cd ./publish
+          zip ${{ matrix.project.name }}-${{ matrix.rid }}.zip ./${{ matrix.project.name }}/${{ matrix.project.name }}
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.project.name }}-${{ matrix.rid }}
+          path: ./publish/${{ matrix.project.name }}-${{ matrix.rid }}.zip
+
+      - name: Create release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release view ${{ steps.extract_version.outputs.release_tag }} || gh release create ${{ steps.extract_version.outputs.release_tag }} --title "Release ${{ steps.extract_version.outputs.version }}" --notes "Automated release for ${{ steps.extract_version.outputs.release_tag }} tag."
+
+      - name: Upload release assets
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release upload ${{ steps.extract_version.outputs.release_tag }} ./publish/${{ matrix.project.name }}-${{ matrix.rid }}.zip
