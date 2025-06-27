@@ -18,7 +18,7 @@
     <Company>TheBlueSky.Net</Company>
     <Copyright>© 2025 TheBlueSky.Net</Copyright>
     <NeutralLanguage>en-GB</NeutralLanguage>
-    <AssemblyVersion>1.1.0</AssemblyVersion>
+    <AssemblyVersion>1.2.0</AssemblyVersion>
     <FileVersion>$(AssemblyVersion)</FileVersion>
     <AssemblyInformationalVersion>1.0 RTM</AssemblyInformationalVersion>
   </PropertyGroup>
@@ -31,6 +31,7 @@
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <RepositoryUrl>https://github.com/TheBlueSky/dotnet-venv.git</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageTags>.NET;dotnet;dotnet tool;venv;Virtual Environment</PackageTags>
   </PropertyGroup>
 
@@ -38,6 +39,10 @@
     <EmbeddedResource Include="data\*" />
     <EmbeddedResource Include="scripts\activation\*" />
     <EmbeddedResource Include="scripts\installation\*" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\README.md" Pack="true" PackagePath="\"/>
   </ItemGroup>
 
 </Project>
