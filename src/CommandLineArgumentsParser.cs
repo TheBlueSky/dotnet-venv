@@ -1,6 +1,6 @@
 namespace TheBlueSky.DotNet.Tools.VirtualEnvironment;
 
-internal sealed class CommandLineArgumentsParser
+internal static class CommandLineArgumentsParser
 {
 	private const string OptionStartChar = "-";
 

@@ -48,9 +48,9 @@ internal sealed class VirtualEnvironmentCreator
 
 		if (matchingRelease is null)
 		{
-			PrintMessage($"The {requestedRelease} release does not seem to be a valid .NET release.", true);
-			PrintMessage("If you are not connected to the internet, it is possible that 'dotnet-venv' data is outdated.", true);
-			PrintMessage("Connect to the internet and try again.", true);
+			PrintMessage($"The {requestedRelease} release does not seem to be a valid .NET release.", isVerbose: true);
+			PrintMessage("If you are not connected to the internet, it is possible that 'dotnet-venv' data is outdated.", isVerbose: true);
+			PrintMessage("Connect to the internet and try again.", isVerbose: true);
 
 			return 1;
 		}
@@ -111,6 +111,7 @@ internal sealed class VirtualEnvironmentCreator
 		}
 		catch (Exception)
 		{
+			// Intentionally ignoring the exception.
 		}
 
 		return isInternetConnected ?
@@ -127,7 +128,7 @@ internal sealed class VirtualEnvironmentCreator
 
 		static async Task<IReadOnlyList<Release>> GetDotNetReleasesFromEmbeddedResource()
 		{
-			using var dotnetReleasesFileStream = Constants.ApplicationAssembly.GetManifestResourceStream("data.dotnet-releases.json")!;
+			await using var dotnetReleasesFileStream = Constants.ApplicationAssembly.GetManifestResourceStream("data.dotnet-releases.json")!;
 			var releases = await JsonSerializer.DeserializeAsync(dotnetReleasesFileStream, ReleasesJsonContext.Default.Releases);
 			return releases!.ReleasesIndex;
 		}
@@ -152,8 +153,7 @@ internal sealed class VirtualEnvironmentCreator
 				var lineSpan = line.AsSpan();
 				var versionIndex = lineSpan.IndexOf(' ');
 				var version = lineSpan[..versionIndex];
-				var directory = lineSpan[(versionIndex + 1)..].TrimStart('[').TrimEnd(']');
-				sdks.Add(new Sdk(version.ToString(), directory.ToString()));
+				sdks.Add(new Sdk(version.ToString()));
 			}
 
 			await process.WaitForExitAsync();
@@ -188,8 +188,8 @@ internal sealed class VirtualEnvironmentCreator
 		var fileName = embeddedInstallationScript[(embeddedInstallationScript.IndexOf(installationPart, StringComparison.OrdinalIgnoreCase) + installationPart.Length)..];
 		var installationScript = Path.Combine(Path.GetTempPath(), Path.GetFileName(fileName));
 
-		using var installationScriptStream = Constants.ApplicationAssembly.GetManifestResourceStream(embeddedInstallationScript)!;
-		using var installationScriptFileStream = File.Create(installationScript);
+		await using var installationScriptStream = Constants.ApplicationAssembly.GetManifestResourceStream(embeddedInstallationScript)!;
+		await using var installationScriptFileStream = File.Create(installationScript);
 
 		await installationScriptStream.CopyToAsync(installationScriptFileStream);
 

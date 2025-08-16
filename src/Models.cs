@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace TheBlueSky.DotNet.Tools.VirtualEnvironment;
 
-internal sealed record class Sdk(string Version, string InstallationDirectory);
+internal sealed record class Sdk(string Version);
 
 internal sealed record class Releases([property: JsonPropertyName("releases-index")] IReadOnlyList<Release> ReleasesIndex);
 
@@ -25,9 +25,7 @@ internal sealed record class Release(
 [JsonSourceGenerationOptions(PropertyNameCaseInsensitive = true, WriteIndented = true, PropertyNamingPolicy = JsonKnownNamingPolicy.CamelCase)]
 [JsonSerializable(typeof(Releases))]
 [JsonSerializable(typeof(Release))]
-internal sealed partial class ReleasesJsonContext : JsonSerializerContext
-{
-}
+internal sealed partial class ReleasesJsonContext : JsonSerializerContext;
 
 internal sealed record class GlobalJson([property: JsonPropertyName("sdk")] GlobalJsonSdk Sdk);
 
@@ -39,6 +37,4 @@ internal sealed record class GlobalJsonSdk(
 [JsonSourceGenerationOptions(PropertyNameCaseInsensitive = true, WriteIndented = true, PropertyNamingPolicy = JsonKnownNamingPolicy.CamelCase)]
 [JsonSerializable(typeof(GlobalJson))]
 [JsonSerializable(typeof(GlobalJsonSdk))]
-internal sealed partial class GlobalJsonJsonContext : JsonSerializerContext
-{
-}
+internal sealed partial class GlobalJsonJsonContext : JsonSerializerContext;
