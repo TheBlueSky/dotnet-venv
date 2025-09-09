@@ -7,6 +7,7 @@ on:
 
 jobs:
   build:
+    name: Build for ${{matrix.rid}}
     runs-on: ${{ matrix.os }}
 
     permissions:
@@ -14,17 +15,21 @@ jobs:
 
     strategy:
       matrix:
-        os: [macos-latest, ubuntu-latest, windows-latest]
+        os: [macos-14, ubuntu-24.04, ubuntu-24.04-arm, windows-2025, windows-11-arm]
         project:
           - name: dotnet-venv
             path: src/dotnet-venv.csproj
         include:
-          - os: macos-latest
-            rid: osx-x64
-          - os: ubuntu-latest
+          - os: macos-14
+            rid: osx-arm64
+          - os: ubuntu-24.04
             rid: linux-x64
-          - os: windows-latest
+          - os: ubuntu-24.04-arm
+            rid: linux-arm64
+          - os: windows-2025
             rid: win-x64
+          - os: windows-11-arm
+            rid: win-arm64
 
     steps:
       - name: Checkout code
@@ -55,13 +60,13 @@ jobs:
         run: dotnet publish ./${{ matrix.project.path }} --configuration Release --framework net9.0 --runtime ${{ matrix.rid }} --self-contained -p:PublishAot=true -p:Version=${{ steps.extract_version.outputs.version }} --output ./publish/${{ matrix.project.name }}
 
       - name: Create artifact archive (Windows)
-        if: matrix.os == 'windows-latest'
+        if: runner.os == 'Windows'
         run: |
           cd ./publish
           7z a -tzip ${{ matrix.project.name }}-${{ matrix.rid }}.zip ${{ matrix.project.name }}/${{ matrix.project.name }}.exe
 
       - name: Create artifact archive (Linux/macOS)
-        if: matrix.os != 'windows-latest'
+        if: runner.os != 'Windows'
         run: |
           cd ./publish
           zip ${{ matrix.project.name }}-${{ matrix.rid }}.zip ./${{ matrix.project.name }}/${{ matrix.project.name }}
