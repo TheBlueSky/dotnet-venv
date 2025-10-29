@@ -1,4 +1,5 @@
-# This file MUST be used with "source bin/activate" *from bash*
+# This file MUST be used with "source .net/activate" *from bash*,
+# where .net is the name of the virtual environment you want to activate.
 
 deactivate () {
     # Reset old environment variables
