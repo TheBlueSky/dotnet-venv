@@ -141,10 +141,10 @@ internal sealed class VirtualEnvironmentCreator
 			var process = StartNewProcess("dotnet", "--list-sdks");
 			var sdks = new List<Sdk>();
 
-			while (!process.StandardOutput.EndOfStream)
-			{
-				var line = await process.StandardOutput.ReadLineAsync();
+			var line = null as string;
 
+			while ((line = await process.StandardOutput.ReadLineAsync()) is not null)
+			{
 				if (line is null)
 				{
 					continue;
@@ -202,9 +202,10 @@ internal sealed class VirtualEnvironmentCreator
 			StartNewProcess("powershell", $"-ExecutionPolicy bypass -File \"{installationScript}\" -Version {version} -InstallDir {directory}") :
 			StartNewProcess("bash", $"\"{installationScript}\" --version {version} --install-dir {directory}");
 
-		while (!process.StandardOutput.EndOfStream)
+		var line = null as string;
+
+		while ((line = await process.StandardOutput.ReadLineAsync()) is not null)
 		{
-			var line = await process.StandardOutput.ReadLineAsync();
 			printMessage(line ?? "", isVerbose);
 		}
 

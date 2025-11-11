@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFrameworks>net8.0;net9.0</TargetFrameworks>
+    <TargetFrameworks>net8.0;net9.0;net10.0</TargetFrameworks>
     <PublishSingleFile Condition="'$(PublishAot)' == 'true'">true</PublishSingleFile>
     <SelfContained Condition="'$(PublishAot)' == 'true'">true</SelfContained>
     <PackAsTool Condition="'$(PublishAot)' == 'false'">true</PackAsTool>
@@ -18,7 +18,7 @@
     <Company>TheBlueSky.Net</Company>
     <Copyright>© 2025 TheBlueSky.Net</Copyright>
     <NeutralLanguage>en-GB</NeutralLanguage>
-    <AssemblyVersion>1.6.0</AssemblyVersion>
+    <AssemblyVersion>1.7.0</AssemblyVersion>
     <FileVersion>$(AssemblyVersion)</FileVersion>
     <AssemblyInformationalVersion>1.0 RTM</AssemblyInformationalVersion>
   </PropertyGroup>
