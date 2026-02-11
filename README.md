@@ -14,7 +14,7 @@ If you are familiar with Python venv, `dotnet-venv` works similarly by creating 
 
 ### Using .NET SDK
 
-If you have .NET 8.0 or .NET 9.0 SDK installed, you can install `dotnet-venv` as a .NET Tool.
+If you have .NET 8, .NET 9, or .NET 10 SDK installed, you can install `dotnet-venv` as a .NET Tool.
 
 Run the following command:
 
@@ -24,7 +24,7 @@ dotnet tool install dotnet-venv --global
 
 ### Using the standalone executable
 
-If you do not have .NET 8.0 or .NET 9.0 SDK installed, or if you prefer to use the standalone executable, follow the following steps:
+If you do not have .NET 8, .NET 9, or .NET 10 SDK installed, or if you prefer to use the standalone executable, follow the following steps:
 
 1. Head to the [Releases](https://github.com/TheBlueSky/dotnet-venv/releases) page.
 2. Download the latest release suitable for your operating system.
