@@ -11,16 +11,20 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     permissions:
-      contents: write # Allows creating releases and uploading assets
+      contents: read
+
+    outputs:
+      version: ${{ steps.extract_version.outputs.version }}
+      release_tag: ${{ steps.extract_version.outputs.release_tag }}
 
     strategy:
       matrix:
-        os: [macos-14, ubuntu-24.04, ubuntu-24.04-arm, windows-2025, windows-11-arm]
+        os: [macos-15, ubuntu-24.04, ubuntu-24.04-arm, windows-2025, windows-11-arm]
         project:
           - name: dotnet-venv
             path: src/dotnet-venv.csproj
         include:
-          - os: macos-14
+          - os: macos-15
             rid: osx-arm64
           - os: ubuntu-24.04
             rid: linux-x64
@@ -77,13 +81,29 @@ jobs:
           name: ${{ matrix.project.name }}-${{ matrix.rid }}
           path: ./publish/${{ matrix.project.name }}-${{ matrix.rid }}.zip
 
-      - name: Create release
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh release view ${{ steps.extract_version.outputs.release_tag }} || gh release create ${{ steps.extract_version.outputs.release_tag }} --title "Release ${{ steps.extract_version.outputs.version }}" --notes "Automated release for ${{ steps.extract_version.outputs.release_tag }} tag."
+  release:
+    name: Create GitHub release
+    needs: build
+    runs-on: ubuntu-24.04
 
-      - name: Upload release assets
+    permissions:
+      contents: write # Allows creating releases and uploading assets
+
+    steps:
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: ./artifacts
+          merge-multiple: true
+
+      - name: Create release and upload assets
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          RELEASE_TAG: ${{ needs.build.outputs.release_tag }}
+          VERSION: ${{ needs.build.outputs.version }}
         run: |
-          gh release upload ${{ steps.extract_version.outputs.release_tag }} ./publish/${{ matrix.project.name }}-${{ matrix.rid }}.zip
+          if ! gh release view "$RELEASE_TAG" > /dev/null 2>&1; then
+            gh release create "$RELEASE_TAG" --verify-tag --title "Release $VERSION" --notes "Automated release for $RELEASE_TAG tag."
+          fi
+          gh release upload "$RELEASE_TAG" ./artifacts/*.zip --clobber
